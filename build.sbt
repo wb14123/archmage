@@ -20,6 +20,7 @@ ThisBuild / developers := List(
 
 
 lazy val root = (project in file("."))
+  .aggregate(core, coretest)
   .settings(
     name := "archmage"
   )
