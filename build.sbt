@@ -38,3 +38,5 @@ lazy val coretest = (project in file("coretest"))
   .settings(
     name := "core-test"
   ) dependsOn core
+
+ThisBuild / scalacOptions += "-Ymacro-debug-lite"

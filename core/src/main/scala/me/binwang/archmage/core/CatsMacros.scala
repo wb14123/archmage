@@ -36,13 +36,15 @@ object CatsMacroImpl {
 
   @compileTimeOnly("Enable macro paradise plugin to expand macro annotations or add scalac flag -Ymacro-annotations.")
   def insertIO[B: c.WeakTypeTag, T: c.WeakTypeTag](c: blackbox.Context)(
-      before: c.Expr[MethodMeta => IO[B]], block: c.Expr[IO[T]],
+      before: c.Expr[MethodMeta => IO[B]], blockTree: c.Tree,
       after: c.Expr[(B, T, MethodMeta) => IO[_]]): c.Expr[IO[T]] = {
 
-    import c.universe.reify
+    import c.universe._
 
     val name = functionNameImpl(c)
     val args = argumentsMapImpl(c)
+    val cleanedBlock = c.untypecheck(blockTree.duplicate)
+    val block = c.Expr[IO[T]](q"$cleanedBlock")
 
     reify {
       val methodMeta = MethodMeta(
@@ -60,13 +62,15 @@ object CatsMacroImpl {
 
   @compileTimeOnly("Enable macro paradise plugin to expand macro annotations or add scalac flag -Ymacro-annotations.")
   def insertStream[B: c.WeakTypeTag, T: c.WeakTypeTag](c: blackbox.Context)(
-    before: c.Expr[MethodMeta => IO[B]], block: c.Expr[fs2.Stream[IO, T]],
+    before: c.Expr[MethodMeta => IO[B]], blockTree: c.Tree,
     after: c.Expr[(B, MethodMeta) => IO[_]]): c.Expr[fs2.Stream[IO, T]] = {
 
-    import c.universe.reify
+    import c.universe._
 
     val name = functionNameImpl(c)
     val args = argumentsMapImpl(c)
+    val cleanedBlock = c.untypecheck(blockTree.duplicate)
+    val block = c.Expr[fs2.Stream[IO, T]](q"$cleanedBlock")
 
     reify {
       val methodMeta = MethodMeta(
@@ -81,7 +85,7 @@ object CatsMacroImpl {
   }
 
   @compileTimeOnly("Enable macro paradise plugin to expand macro annotations or add scalac flag -Ymacro-annotations.")
-  def timedIO[T: c.WeakTypeTag](c: blackbox.Context)(block: c.Expr[IO[T]])
+  def timedIO[T: c.WeakTypeTag](c: blackbox.Context)(block: c.Tree)
       (handleTime: c.Expr[(MethodMeta, FiniteDuration) => IO[Unit]]): c.Expr[IO[T]] = {
     import c.universe.reify
     val before = reify { (_: MethodMeta) => Clock[IO].monotonic }
@@ -93,7 +97,7 @@ object CatsMacroImpl {
   }
 
   @compileTimeOnly("Enable macro paradise plugin to expand macro annotations or add scalac flag -Ymacro-annotations.")
-  def timedStream[T: c.WeakTypeTag](c: blackbox.Context)(block: c.Expr[fs2.Stream[IO, T]])
+  def timedStream[T: c.WeakTypeTag](c: blackbox.Context)(block: c.Tree)
       (handleTime: c.Expr[(MethodMeta, FiniteDuration) => IO[Unit]]): c.Expr[fs2.Stream[IO, T]] = {
     import c.universe.reify
     val before = reify { (_: MethodMeta) => Clock[IO].monotonic }
@@ -132,10 +136,10 @@ object CatsMacroImpl {
 
 object CatsMacros {
 
-  def timed[T](block: IO[T])
-      (implicit handleTime: (MethodMeta, FiniteDuration) => IO[Unit]): IO[T]= macro CatsMacroImpl.timedIO[T]
+  def timed[T](block: => IO[T])
+      (implicit handleTime: (MethodMeta, FiniteDuration) => IO[Unit]): IO[T] = macro CatsMacroImpl.timedIO[T]
 
-  def timed[T](block: fs2.Stream[IO, T])
+  def timed[T](block: => fs2.Stream[IO, T])
       (implicit handleTime: (MethodMeta, FiniteDuration) => IO[Unit]): fs2.Stream[IO, T] = macro CatsMacroImpl.timedStream[T]
 
 }
