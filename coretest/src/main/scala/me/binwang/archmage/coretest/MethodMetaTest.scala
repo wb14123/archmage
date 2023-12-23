@@ -1,10 +1,7 @@
 package me.binwang.archmage.coretest
 
 import cats.effect.IO
-import cats.effect.kernel.Clock
 import cats.effect.unsafe.implicits.global
-import me.binwang.archmage.core
-import me.binwang.archmage.core.CatsMacroImpl
 import me.binwang.archmage.core.CatsMacroImpl.MethodMeta
 import me.binwang.archmage.core.CatsMacros.timed
 
