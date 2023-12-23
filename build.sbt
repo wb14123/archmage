@@ -1,4 +1,6 @@
 
+import sbt.Keys.{libraryDependencies, organization, publishTo}
+import sbt.url
 import xerial.sbt.Sonatype.autoImport.sonatypePublishToBundle
 
 ThisBuild / version := "0.1.0-SNAPSHOT"
@@ -39,4 +41,5 @@ lazy val coretest = (project in file("coretest"))
     name := "core-test"
   ) dependsOn core
 
-ThisBuild / scalacOptions += "-Ymacro-debug-lite"
+// uncomment the code below to enable macro debug
+// ThisBuild / scalacOptions += "-Ymacro-debug-lite"
