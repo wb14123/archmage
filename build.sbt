@@ -2,14 +2,14 @@
 import sbt.Keys.{libraryDependencies, organization, publishTo}
 import sbt.url
 import xerial.sbt.Sonatype.autoImport.sonatypePublishToBundle
+import xerial.sbt.Sonatype.sonatypeCentralHost
 
-ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / version := "0.1.0"
 ThisBuild / scalaVersion := "2.13.12"
 ThisBuild / organization := "me.binwang.archmage"
 
 ThisBuild / publishTo := sonatypePublishToBundle.value
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 ThisBuild / licenses := Seq("AGPL" -> url("https://github.com/wb14123/archmage/blob/master/LICENSE"))
 ThisBuild / homepage := Some(url("https://github.com/wb14123/archmage"))
 ThisBuild / scmInfo := Some(ScmInfo(
